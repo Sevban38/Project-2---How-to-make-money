@@ -73,6 +73,8 @@ def create_pdf(order_data, pdf_path):
     c.save()
 
 # JSON-bestanden verwerken
+order_count = 0  # Tel het aantal orders
+
 for filename in os.listdir(input_folder):
     if filename.endswith(".json"):
         input_file_path = os.path.join(input_folder, filename)
@@ -83,7 +85,7 @@ for filename in os.listdir(input_folder):
                 order_data = json.load(file)
 
             # Order-ID verkrijgen voor bestandsnaam
-            order_id = order_data.get("order", {}).get("id", "unknown")
+            order_id = order_data.get("order", {}).get("id", f"unknown_{order_count}")
             pdf_filename = f"order_{order_id}.pdf"
             pdf_path = os.path.join(pdf_folder, pdf_filename)
 
@@ -95,10 +97,12 @@ for filename in os.listdir(input_folder):
             os.rename(input_file_path, processed_path)
             print(f"✅ PDF gegenereerd: {pdf_path}")
 
+            order_count += 1  # Tel de verwerkte order
+
         except Exception as e:
             # Fout opslaan in error map
             error_path = os.path.join(error_folder, filename)
             os.rename(input_file_path, error_path)
             print(f"❌ Fout in {filename}, verplaatst naar {error_folder}: {e}")
 
-print("🚀 Batchverwerking voltooid!")
+print(f"🚀 Batchverwerking voltooid! {order_count} PDF’s gegenereerd.")
